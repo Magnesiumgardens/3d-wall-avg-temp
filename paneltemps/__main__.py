@@ -31,6 +31,13 @@ def _positive(value):
 
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "reconstruct":
+        try:
+            from .reconstruct_cli import main as reconstruct
+        except ImportError as exc:
+            raise SystemExit("CAD dependencies are missing. Install requirements-cad.txt (Python 3.12 recommended). " + str(exc)) from exc
+        return reconstruct(argv[1:])
     parser = argparse.ArgumentParser(description="Export per-panel surface temperatures and an offline 3D mapping check.")
     parser.add_argument("input", type=Path, help="named-column CFD export or six-column CSV/whitespace file")
     parser.add_argument("--panels", type=Path, required=True, help="explicit JSON panel mapping")

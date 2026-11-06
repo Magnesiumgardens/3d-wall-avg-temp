@@ -15,6 +15,12 @@ wall-temperature interpretation still require validation.
 
 ## Run
 
+**For the actual MK3 STEP and two M08 files**, use the new
+[CAD reconstruction workflow and Windows commands](docs/RECONSTRUCTION.md).
+It adds the optional CAD dependencies in `requirements-cad.txt` and uses
+`python -m paneltemps reconstruct`. The six-column/triangle demonstrations below
+remain available with the smaller base requirements.
+
 Python 3.10+ is required (validated here on Python 3.12).
 Use the existing checkout; cloud tasks already have an isolated workspace and do
 not need a separate Git worktree.

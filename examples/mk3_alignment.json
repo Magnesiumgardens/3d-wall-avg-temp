@@ -1,0 +1,28 @@
+{
+  "description": "Candidate rigid alignment for the supplied MK3 STEP and M08 BC point set. Physical CAD orientation and face selections remain unreviewed.",
+  "cad_sha256": "34013d443400c68c01864dcda8b084650db0a2b648a8e2e8a593e3d3fd58ac42",
+  "source_coordinates_sha256": "53dd334c43d83b6a1cd9f3b7999488f084a4de4a03adeac8bead5b967e923567",
+  "rotation_BC_to_CAD": [
+    [
+      2.9997109743908145e-05,
+      0.9999999825508467,
+      0.00018438676417521872
+    ],
+    [
+      0.01742796471342433,
+      -0.00018488154843249746,
+      0.9998481043962429
+    ],
+    [
+      0.999848121039451,
+      -2.677906729514447e-05,
+      -0.017427969955233203
+    ]
+  ],
+  "translation_m": [
+    0.9201033933039521,
+    1.3848259275595314,
+    0.9363426884816707
+  ],
+  "transform_convention": "CAD_point_m = rotation_BC_to_CAD @ BC_point_m + translation_m"
+}
