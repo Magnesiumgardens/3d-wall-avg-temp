@@ -1,0 +1,14 @@
+{
+  "panels": [
+    {
+      "id": "base", "name": "Synthetic base",
+      "selection_notes": "DEMO ONLY; no CAD component or face has been supplied.",
+      "selector": {"type": "mesh_panel", "value": "base"}
+    },
+    {
+      "id": "side", "name": "Synthetic side",
+      "selection_notes": "DEMO ONLY; no CAD component or face has been supplied.",
+      "selector": {"type": "mesh_panel", "value": "side"}
+    }
+  ]
+}

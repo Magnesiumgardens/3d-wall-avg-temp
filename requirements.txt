@@ -1,0 +1,5 @@
+# Offline interactive HTML export; the parser and calculations use the standard library.
+plotly==6.3.1
+# Pin Plotly's runtime dependencies for repeatable installs.
+narwhals==2.28.0
+packaging==26.3

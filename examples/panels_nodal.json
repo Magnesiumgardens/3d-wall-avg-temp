@@ -1,0 +1,9 @@
+{
+  "panels": [
+    {
+      "id": "all_points", "name": "Synthetic points (not a CAD panel)",
+      "selection_notes": "DEMO ONLY; arithmetic nodal average, no surface area.",
+      "selector": {"type": "node_ids", "ids": [1, 2, 3, 4, 5, 6]}
+    }
+  ]
+}
