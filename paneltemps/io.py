@@ -37,24 +37,45 @@ def _number(value):
     return number
 
 
-def read_nodes(path, coordinate_unit="m", temperature_unit="K"):
+def read_nodes(path, coordinate_unit="m", temperature_unit="K", temperature_column=None):
     if coordinate_unit not in COORDINATE_SCALES or temperature_unit not in ("K", "C", "F"):
         raise ValueError("unsupported coordinate or temperature unit")
     scale = COORDINATE_SCALES[coordinate_unit]
     nodes = {}
     first = True
+    indices = [0, 1, 2, 3, 4, 5]
+    width = 6
+    if temperature_column not in (None, "temperature", "wall-temperature"):
+        raise ValueError("temperature_column must be temperature or wall-temperature")
     for line_number, fields in _rows(path):
         if first:
             first = False
-            if _header(fields) == ["nodenumber", "xcoordinate", "ycoordinate", "zcoordinate", "pressure", "walltemperature"]:
+            header = _header(fields)
+            if "nodenumber" in header:
+                if len(header) != len(set(header)):
+                    raise ValueError(f"{path}: duplicate column names")
+                chosen = _header([temperature_column])[0] if temperature_column else (
+                    "walltemperature" if "walltemperature" in header else "temperature")
+                required = ["nodenumber", "xcoordinate", "ycoordinate", "zcoordinate", "pressure", chosen]
+                if not set(required) <= set(header):
+                    raise ValueError(f"{path}: missing required named columns {sorted(set(required)-set(header))}")
+                indices = [header.index(key) for key in required]
+                width = len(header)
                 continue
+            if temperature_column == "temperature":
+                raise ValueError("explicit temperature column requires a named header")
         try:
-            if len(fields) != 6:
-                raise ValueError(f"expected 6 fields, found {len(fields)}")
-            node_id = _identifier(fields[0])
+            if len(fields) != width:
+                raise ValueError(f"expected {width} fields, found {len(fields)}")
+            selected = [fields[i] for i in indices]
+            node_id = _identifier(selected[0])
             if node_id in nodes:
                 raise ValueError(f"duplicate node ID {node_id}")
-            x, y, z, pressure, temperature = map(_number, fields[1:])
+            # Validate auxiliary CFD columns too; originals retain all fields.
+            for i, value in enumerate(fields):
+                if i != indices[0]:
+                    _number(value)
+            x, y, z, pressure, temperature = map(_number, selected[1:])
             x, y, z = x * scale, y * scale, z * scale
             if temperature_unit == "C":
                 temperature += 273.15

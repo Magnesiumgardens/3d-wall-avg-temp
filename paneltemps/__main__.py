@@ -32,13 +32,15 @@ def _positive(value):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Export per-panel surface temperatures and an offline 3D mapping check.")
-    parser.add_argument("input", type=Path, help="six-column boundary-condition CSV or whitespace file")
+    parser.add_argument("input", type=Path, help="named-column CFD export or six-column CSV/whitespace file")
     parser.add_argument("--panels", type=Path, required=True, help="explicit JSON panel mapping")
     parser.add_argument("--elements", type=Path, help="linear triangle connectivity CSV")
     parser.add_argument("--method", choices=("area", "nodal"), default="area",
                         help="default: area, which requires --elements; nodal is explicitly provisional")
     parser.add_argument("--coordinate-unit", choices=tuple(COORDINATE_SCALES), default="m")
     parser.add_argument("--temperature-unit", choices=("K", "C", "F"), default="K")
+    parser.add_argument("--temperature-column", choices=("temperature", "wall-temperature"),
+                        help="named source field; default prefers wall-temperature, otherwise temperature")
     parser.add_argument("--wall-temperature-kind", choices=("unknown", "prescribed", "adiabatic", "structural"), default="unknown")
     parser.add_argument("--case-label", default="unspecified", help="source case identity, e.g. synthetic_demo")
     parser.add_argument("--allow-unmapped", action="store_true", help="allow partial coverage; report every omitted ID")
@@ -50,7 +52,7 @@ def main(argv=None):
             raise ValueError("area method requires --elements; select --method nodal explicitly for provisional arithmetic averages")
         if args.output_dir.exists() and (not args.output_dir.is_dir() or any(args.output_dir.iterdir())):
             raise ValueError("--output-dir must be a new or empty directory")
-        nodes = read_nodes(args.input, args.coordinate_unit, args.temperature_unit)
+        nodes = read_nodes(args.input, args.coordinate_unit, args.temperature_unit, args.temperature_column)
         triangles = read_triangles(args.elements, nodes) if args.elements else []
         panels = load_panels(args.panels)
         assignments = assign_panels(nodes, triangles, panels, args.method, args.allow_unmapped)
@@ -113,6 +115,7 @@ def main(argv=None):
         report = {
             "tool_version": __version__, "case_label": args.case_label, "method": args.method,
             "input_coordinate_unit": args.coordinate_unit, "input_temperature_unit": args.temperature_unit,
+            "temperature_column_selection": args.temperature_column or "auto: wall-temperature preferred, otherwise temperature",
             "output_coordinate_unit": "m", "output_temperature_unit": "K",
             "wall_temperature_kind": args.wall_temperature_kind,
             "input_node_count": len(nodes), "input_element_count": len(triangles), "panel_count": len(panels),

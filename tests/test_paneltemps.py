@@ -44,6 +44,24 @@ class TemporaryInputs(unittest.TestCase):
 
 
 class NodeParsingTests(TemporaryInputs):
+    def test_named_isothermal_export_keeps_temperature_separate_from_flux(self):
+        path = self.write("iso", "nodenumber,x-coordinate,y-coordinate,z-coordinate,pressure,temperature,heat-flux\n1,0,0,0,100,300,-10000\n")
+        self.assertEqual(read_nodes(path)[1].temperature, 300)
+        with self.assertRaises(ValueError):
+            read_nodes(path, temperature_column="wall-temperature")
+
+    def test_named_adiabatic_export_prefers_wall_temperature(self):
+        path = self.write("adiab", "nodenumber,x-coordinate,y-coordinate,z-coordinate,pressure,dynamic-pressure,temperature,wall-temperature\n1,0,0,0,100,4,2200,2300\n")
+        self.assertEqual(read_nodes(path)[1].temperature, 2300)
+        self.assertEqual(read_nodes(path, temperature_column="temperature")[1].temperature, 2200)
+
+    def test_named_columns_allow_reordering_but_reject_duplicate_headers(self):
+        path = self.write("reordered", "temperature,pressure,z-coordinate,y-coordinate,x-coordinate,nodenumber\n300,100,3,2,1,5\n")
+        self.assertEqual(read_nodes(path)[5].xyz, (1, 2, 3))
+        bad = self.write("duplicate", "nodenumber,x-coordinate,y-coordinate,z-coordinate,pressure,temperature,temperature\n1,0,0,0,100,300,301\n")
+        with self.assertRaises(ValueError):
+            read_nodes(bad)
+
     def test_comma_scientific_and_fortran_notation(self):
         path = self.write("nodes.csv", HEADER + "12,1.642018079E+00,-6.75E-02,-2.448D-01,1.0175E+04,1.843398156E+03\n")
         nodes = read_nodes(path)

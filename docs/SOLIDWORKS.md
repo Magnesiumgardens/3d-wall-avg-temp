@@ -1,10 +1,11 @@
 # Apply panel temperatures in SOLIDWORKS Simulation
 
-This is a manual first-pass workflow. The supplied handoff contains no CAD model,
-surface mesh, material definitions, or temperature-source metadata. Consequently,
-neither exterior-skin coverage nor correspondence with actual CAD faces has been
-verified. Demonstration outputs are synthetic and must not be applied to a real
-assembly.
+This is a manual first-pass workflow. The selected MK3 watertight CAD model and
+two M08 BC exports have been inspected; see [the case notes](MK3_M08.md).
+Material definitions, reviewed thermal panels, and original surface connectivity
+are still unavailable. Neither exterior-skin representation nor correspondence
+with actual thermal load selections has been verified. Demonstration outputs
+are synthetic and must not be applied to a real assembly.
 
 ## Establish what the temperatures mean
 

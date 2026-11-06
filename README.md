@@ -1,15 +1,17 @@
 # Surface panel temperature averaging
 
-A standalone Python post-processor for six-column nodal boundary-condition data.
+A standalone Python post-processor for nodal boundary-condition data.
 It exports panel temperatures, an auditable panel/CAD association table, coverage
 reports, and a self-contained interactive 3D visualization. It does not modify or
 run aerodynamic or thermal solvers.
 
-**Current data status:** only the written handoff was supplied. There is no actual
-vehicle dataset, mesh connectivity, or CAD model in this checkout. Everything in
-`examples/` and the generated `outputs/synthetic_*` directories is a synthetic
-software demonstration. No real panel definitions, units, CAD matches, exterior
-skin, component coverage, or wall-temperature interpretation have been verified.
+**Current data status:** the selected MK3 watertight CAD model and two M08 BC
+exports have been inspected. The user confirmed BC coordinates in **meters** and
+temperatures in **Kelvin**. See [the MK3 case notes](docs/MK3_M08.md).
+Uploaded source files and generated inspection artifacts are kept outside Git.
+Everything in `examples/` remains a synthetic software demonstration.
+Physical panel definitions, CAD-face correspondence, skin representation, and
+wall-temperature interpretation still require validation.
 
 ## Run
 
@@ -58,14 +60,24 @@ nodenumber,x-coordinate,y-coordinate,z-coordinate,pressure,wall-temperature
 1,1.642018079E+00,-6.750000000E-02,-2.448393844E-01,1.017518533E+04,1.843398156E+03
 ```
 
-Exactly six fields are required in this order. Scientific notation including
+Headerless files require exactly six fields in this order. Named-column exports
+also support additional numeric columns such as `dynamic-pressure` and
+`heat-flux`, including the supplied seven-column isothermal and eight-column
+adiabatic exports. Named columns may be reordered. By default the reader prefers
+`wall-temperature`, falling back to `temperature` when no wall-temperature column
+exists. Use `--temperature-column temperature` or
+`--temperature-column wall-temperature` to choose explicitly. Extra columns are
+validated as numeric but are not used in temperature averaging; byte-for-byte
+input copies preserve them. Heat flux is never treated as temperature.
+
+Scientific notation including
 Fortran `D` exponents is accepted. IDs must be unique positive integers. Invalid
 numbers, nonfinite values, and temperatures below absolute zero are rejected.
 Pressure is preserved but not used in the temperature calculation; its unit need
 not be inferred for this workflow.
 
-Coordinates default to **meters**, and temperatures to **Kelvin**. These are
-assumptions until checked against source metadata. Override with
+Coordinates default to **meters**, and temperatures to **Kelvin**, matching the
+user-confirmed MK3/M08 units. For other datasets, confirm the source units. Override with
 `--coordinate-unit m|mm|cm|in|ft` and `--temperature-unit K|C|F`. Calculations,
 visualizations, areas, and exports always use meters, square meters, and Kelvin.
 Use `--case-label` to record the source case and `--wall-temperature-kind
